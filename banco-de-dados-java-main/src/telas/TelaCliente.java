@@ -18,60 +18,47 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     private void consultar() {
         String sql = "SELECT * FROM tb_cliente WHERE id=?";
 
-        try {
-            pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtId.getText());
-            rs = pst.executeQuery();
+        if (!idValido()) {
+            return;
+        }
+
+        try (PreparedStatement consulta = conexao.prepareStatement(sql)) {
+            consulta.setInt(1, Integer.parseInt(txtId.getText().trim()));
+            rs = consulta.executeQuery();
             
             if (rs.next()) {
-                txtNome.setText(rs.getString(2));
-                txtEndereco.setText(rs.getString(3));
-                txtCidade.setText(rs.getString(4));
-                txtUf.setText(rs.getString(5));
-                txtCpf.setText(rs.getString(6));
-                txtFone.setText(rs.getString(7));
-                txtDataNasc.setText(rs.getString(8));
+                txtNome.setText(rs.getString("nome"));
+                txtEndereco.setText(rs.getString("endereco"));
+                txtCidade.setText(rs.getString("cidade"));
+                txtUf.setText(rs.getString("uf"));
+                txtCpf.setText(rs.getString("cpf"));
+                txtFone.setText(rs.getString("fone"));
+                txtDataNasc.setText(rs.getString("data_nascimento"));
             } else {
-                JOptionPane.showMessageDialog(null, "CLIENTE N√O CADASTRADO...");
-                txtNome.setText(null);
-                txtEndereco.setText(null);
-                txtCidade.setText(null);
-                txtUf.setText(null);
-                txtCpf.setText(null);
-                txtFone.setText(null);
-                txtDataNasc.setText(null);
+                JOptionPane.showMessageDialog(null, "CLIENTE N√ÉO CADASTRADO...");
+                limparCampos(false);
             }
-        } catch (Exception e) {
-            JOptionPane.showConfirmDialog(null, e);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao consultar cliente: " + e.getMessage());
         }
     }
 
     private void adicionar() {
         String sql = "INSERT INTO tb_cliente (nome,endereco,cidade,uf,cpf,fone,data_nascimento) "
                 + "VALUES (?,?,?,?,?,?,?)";
-        try {
-            pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtNome.getText());
-            pst.setString(2, txtEndereco.getText());
-            pst.setString(3, txtCidade.getText());
-            pst.setString(4, txtUf.getText());
-            pst.setString(5, txtCpf.getText());
-            pst.setString(6, txtFone.getText());
-            pst.setString(7, txtDataNasc.getText());
+        if (!camposClienteValidos()) {
+            return;
+        }
+        try (PreparedStatement inclusao = conexao.prepareStatement(sql)) {
+            preencherCliente(inclusao, false);
 
-            int adicionado = pst.executeUpdate(); // retorna 1 se estiver correto
+            int adicionado = inclusao.executeUpdate();
 
             if (adicionado > 0) {
                 JOptionPane.showMessageDialog(null, "Cliente Cadastrado");
                 //      Exibe a msg caso inserido com sucesso
-                //      as linhas abaixo ir„o limpar o formulario
-                txtNome.setText(null);
-                txtEndereco.setText(null);
-                txtCidade.setText(null);
-                txtUf.setText(null);
-                txtCpf.setText(null);
-                txtFone.setText(null);
-                txtDataNasc.setText(null);
+                //      as linhas abaixo ir√£o limpar o formulario
+                limparCampos(true);
             }
 
         } catch (SQLException e) {
@@ -82,23 +69,19 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     }
 
     private void alterar() {
-        String sql = "UPDATE tb_cliente SET id = ?, nome = ?, endereco = ?, cidade = ?,"
-                + " uf = ?, cpf = ?, fone = ?, data_nascimento = ?";
-        try {
-            pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtId.getText());
-            pst.setString(2, txtNome.getText());
-            pst.setString(3, txtEndereco.getText());
-            pst.setString(4, txtCidade.getText());
-            pst.setString(5, txtUf.getText());
-            pst.setString(6, txtCpf.getText());
-            pst.setString(7, txtFone.getText());
-            pst.setString(8, txtDataNasc.getText());
+        String sql = "UPDATE tb_cliente SET nome=?, endereco=?, cidade=?, uf=?, cpf=?, fone=?, data_nascimento=? WHERE id=?";
+        if (!idValido() || !camposClienteValidos()) {
+            return;
+        }
+        try (PreparedStatement atualizacao = conexao.prepareStatement(sql)) {
+            preencherCliente(atualizacao, true);
 
-            int adicionado = pst.executeUpdate();
+            int adicionado = atualizacao.executeUpdate();
             // Retorna 1 se OK
             if (adicionado > 0) {
                 JOptionPane.showMessageDialog(null, "CLIENTE ALTERADO COM SUCESSO");
+            } else {
+                JOptionPane.showMessageDialog(null, "Cliente n√£o encontrado.");
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Erro ao alterar cliente: " + e.getMessage());
@@ -106,25 +89,77 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     }
 
     private void apagar() {
-        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja excluir este cliente?", "ATEN«√O", JOptionPane.YES_NO_OPTION);
+        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja excluir este cliente?", "ATEN√á√ÉO", JOptionPane.YES_NO_OPTION);
         if (confirma == JOptionPane.YES_OPTION) {
             String sql = "DELETE FROM tb_cliente WHERE id = ?";
-            try {
-                pst = conexao.prepareStatement(sql);
-                pst.setString(1, txtId.getText());
-                int apagado = pst.executeUpdate();
+            if (!idValido()) {
+                return;
+            }
+            try (PreparedStatement exclusao = conexao.prepareStatement(sql)) {
+                exclusao.setInt(1, Integer.parseInt(txtId.getText().trim()));
+                int apagado = exclusao.executeUpdate();
                 if (apagado > 0) {
                     JOptionPane.showMessageDialog(null, "CLIENTE APAGADO");
-//                    limpa o formulario
-                    txtNome.setText(null);
-                    txtEndereco.setText(null);
-                    txtCidade.setText(null);
+                    limparCampos(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Cliente n√£o encontrado.");
                 }
-                pst.executeUpdate();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, e);
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "Erro ao apagar cliente: " + e.getMessage());
             }
         }
+    }
+
+    private boolean idValido() {
+        try {
+            if (Integer.parseInt(txtId.getText().trim()) > 0) {
+                return true;
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        JOptionPane.showMessageDialog(null, "Informe um ID num√©rico v√°lido.");
+        return false;
+    }
+
+    private boolean camposClienteValidos() {
+        if (txtNome.getText().trim().isEmpty() || txtEndereco.getText().trim().isEmpty()
+                || txtCidade.getText().trim().isEmpty() || txtUf.getText().trim().isEmpty()
+                || txtCpf.getText().trim().isEmpty() || txtFone.getText().trim().isEmpty()
+                || txtDataNasc.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Preencha todos os campos do cliente.");
+            return false;
+        }
+        if (txtUf.getText().trim().length() != 2) {
+            JOptionPane.showMessageDialog(null, "UF deve ter exatamente duas letras.");
+            return false;
+        }
+        return true;
+    }
+
+    private void preencherCliente(PreparedStatement comando, boolean incluirId) throws SQLException {
+        comando.setString(1, txtNome.getText().trim());
+        comando.setString(2, txtEndereco.getText().trim());
+        comando.setString(3, txtCidade.getText().trim());
+        comando.setString(4, txtUf.getText().trim().toUpperCase());
+        comando.setString(5, txtCpf.getText().trim());
+        comando.setString(6, txtFone.getText().trim());
+        comando.setString(7, txtDataNasc.getText().trim());
+        if (incluirId) {
+            comando.setInt(8, Integer.parseInt(txtId.getText().trim()));
+        }
+    }
+
+    private void limparCampos(boolean limparId) {
+        if (limparId) {
+            txtId.setText(null);
+        }
+        txtNome.setText(null);
+        txtEndereco.setText(null);
+        txtCidade.setText(null);
+        txtUf.setText(null);
+        txtCpf.setText(null);
+        txtFone.setText(null);
+        txtDataNasc.setText(null);
     }
 
     @SuppressWarnings("unchecked")
@@ -163,7 +198,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
 
         ID.setText("ID:");
 
-        nome.setText("EndereÁo:");
+        nome.setText("Endere√ßo:");
 
         email.setText("Nome:");
 

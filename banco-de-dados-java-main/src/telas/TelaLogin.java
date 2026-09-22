@@ -16,23 +16,29 @@ public class TelaLogin extends javax.swing.JFrame {
         conexao = Mod_conexao.conector();
 
         if (conexao != null) {
-            lbl_Status.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icones/KnobValidGreen.png")));
+            lbl_Status.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icones/KnobValidGreen.png")));
         } else {
-            lbl_Status.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icones/KnobCancel.png")));
+            lbl_Status.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icones/KnobCancel.png")));
         }
     }
 
     public void logar() {
-        String sql = "SELECT * FROM tb_usuarios WHERE nome=? AND senha=?";
+        String sql = "SELECT * FROM tb_usuarios WHERE email=? AND senha=?";
 
-        try {
-//            CAPTURAR OUE O USUARIO ESCREVEU  
-            pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtUsuario.getText());
-            pst.setString(2, txtSenha.getText());
+        if (conexao == null) {
+            JOptionPane.showMessageDialog(null, "N√£o foi poss√≠vel conectar ao banco de dados.");
+            return;
+        }
+        if (txtUsuario.getText().trim().isEmpty() || txtSenha.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Informe e-mail e senha.");
+            return;
+        }
 
-//            linha abaixo executa consulta
-            rs = pst.executeQuery();
+        try (PreparedStatement login = conexao.prepareStatement(sql)) {
+            login.setString(1, txtUsuario.getText().trim());
+            login.setString(2, txtSenha.getText());
+
+            rs = login.executeQuery();
 
 //            se existir usuario e senha correspondente
             if (rs.next()) {
@@ -41,16 +47,14 @@ public class TelaLogin extends javax.swing.JFrame {
                 principal.setVisible(true);
                 //TelaPrincipal.lblUsuario.setText(getString(2));
 
-//                 È um metodo que implementa o cÛdigo necessario para finalizar o objeto e liberar a memÛria.
+//                 √© um metodo que implementa o c√≥digo necessario para finalizar o objeto e liberar a mem√≥ria.
                 this.dispose();
-                conexao.close();
-
             } else {
                 JOptionPane.showMessageDialog(null, "Usuario/Senha INVALIDO");
             }
 
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao fazer login: " + e.getMessage());
         }
     }
 
@@ -76,7 +80,7 @@ public class TelaLogin extends javax.swing.JFrame {
 
         lbl_Status.setText("Status");
 
-        lblUsuario.setText("Usu·rios:");
+        lblUsuario.setText("E-mail:");
 
         lblSenha.setText("Senha:");
 

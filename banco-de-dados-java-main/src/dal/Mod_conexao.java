@@ -1,6 +1,7 @@
 package dal;
 
 import java.sql.*;
+import javax.swing.JOptionPane;
 
 public class Mod_conexao {
 
@@ -17,6 +18,7 @@ public class Mod_conexao {
             return conexao;
 
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
             return null;
         }
 

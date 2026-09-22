@@ -38,9 +38,9 @@ public class TelaSobre extends javax.swing.JFrame {
 
         jLabel3.setText("Criado e Desenvolvido por Flavio Silva");
 
-        jLabel4.setText("Distribuição Free");
+        jLabel4.setText("DistribuiÃ§Ã£o Free");
 
-        jLabel5.setText("Data de criação: 22/02/2024");
+        jLabel5.setText("Data de criaÃ§Ã£o: 22/02/2024");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

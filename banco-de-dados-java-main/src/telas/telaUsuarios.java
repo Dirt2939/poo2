@@ -17,48 +17,47 @@ public class telaUsuarios extends javax.swing.JInternalFrame {
     private void consultar(){
     String sql = "SELECT * FROM tb_usuarios WHERE id=?";
     
-    try {
-    pst = conexao.prepareStatement(sql);
-    pst.setString(1,txtId.getText());
-    rs = pst.executeQuery();
+    if (!idValido()) {
+        return;
+    }
+    try (PreparedStatement consulta = conexao.prepareStatement(sql)) {
+    consulta.setInt(1, Integer.parseInt(txtId.getText().trim()));
+    rs = consulta.executeQuery();
     if (rs.next()) {
-        txtNome.setText(rs.getString(2));
-        txtEmail.setText(rs.getString(3));
-        txtSenha.setText(rs.getString(4));
+        txtNome.setText(rs.getString("nome"));
+        txtEmail.setText(rs.getString("email"));
+        txtSenha.setText(rs.getString("senha"));
     } else {
-        JOptionPane.showMessageDialog(null, "USUARIO N�O CADASTRADO...");
-//        nas linhas abaixo limpam os campos do formulario
-        txtNome.setText(null);
-        txtEmail.setText(null);
-        txtSenha.setText(null);
+        JOptionPane.showMessageDialog(null, "USUARIO NÃO CADASTRADO...");
+        limparCampos(false);
     }   
-    }catch (Exception e){
-        JOptionPane.showConfirmDialog(null, e);
+    }catch (SQLException e){
+        JOptionPane.showMessageDialog(null, "Erro ao consultar usuário: " + e.getMessage());
         }
     }
     
    private void adicionar(){
     String sql = "INSERT INTO tb_usuarios (nome,email,senha) VALUES (?,?,?)";
-    try {
-        pst = conexao.prepareStatement(sql);
-        pst.setString(1 ,txtNome.getText());
-        pst.setString(2 ,txtEmail.getText());
-        pst.setString(3 ,txtSenha.getText());
+    if (!camposUsuarioValidos()) {
+        return;
+    }
+    try (PreparedStatement inclusao = conexao.prepareStatement(sql)) {
+        inclusao.setString(1, txtNome.getText().trim());
+        inclusao.setString(2, txtEmail.getText().trim());
+        inclusao.setString(3, txtSenha.getText());
         
-        int adicionado = pst.executeUpdate(); // retorna 1 se estiver correto
+        int adicionado = inclusao.executeUpdate();
         
         if (adicionado > 0) {
             JOptionPane.showMessageDialog(null, "Usuario Cadastrado");
     //      Exibe a msg caso inserido com sucesso
-    //      as linhas abaixo ir�o limpar o formulario
-            txtNome.setText(null);
-            txtEmail.setText(null);
-            txtSenha.setText(null);
+    //      as linhas abaixo irão limpar o formulario
+            limparCampos(true);
         }
         
-//        JOptionPane.showMessageDialog(null, "Usu�rio adicionado com sucesso.")
+//        JOptionPane.showMessageDialog(null, "Usuário adicionado com sucesso.")
     } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Erro ao adicionar usu�rio: " + e.getMessage());
+        JOptionPane.showMessageDialog(null, "Erro ao adicionar usuário: " + e.getMessage());
     } finally {
     }
     
@@ -66,41 +65,78 @@ public class telaUsuarios extends javax.swing.JInternalFrame {
    
     private void alterar() {
         String sql = "UPDATE tb_usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?";
-        try {
-            pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtNome.getText());
-            pst.setString(2, txtEmail.getText());
-            pst.setString(3, txtSenha.getText());
-            pst.setString(4, txtId.getText());
-            int adicionado = pst.executeUpdate();
+        if (!idValido() || !camposUsuarioValidos()) {
+            return;
+        }
+        try (PreparedStatement atualizacao = conexao.prepareStatement(sql)) {
+            atualizacao.setString(1, txtNome.getText().trim());
+            atualizacao.setString(2, txtEmail.getText().trim());
+            atualizacao.setString(3, txtSenha.getText());
+            atualizacao.setInt(4, Integer.parseInt(txtId.getText().trim()));
+            int adicionado = atualizacao.executeUpdate();
             // Retorna 1 se OK
             if (adicionado > 0) {
-                JOptionPane.showMessageDialog(null, "USU�RIO ALTERADO COM SUCESSO");
+                JOptionPane.showMessageDialog(null, "USUÁRIO ALTERADO COM SUCESSO");
+            } else {
+                JOptionPane.showMessageDialog(null, "Usuário não encontrado.");
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Erro ao alterar usu�rio: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erro ao alterar usuário: " + e.getMessage());
         }
     }
     private void apagar(){
-        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja excluir este usuario?", "ATEN��O", JOptionPane.YES_NO_OPTION);
+        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja excluir este usuario?", "ATENÇÃO", JOptionPane.YES_NO_OPTION);
         if(confirma == JOptionPane.YES_OPTION){
             String sql = "DELETE FROM tb_usuarios WHERE id = ?";
-            try{
-                pst = conexao.prepareStatement(sql);
-                pst.setString(1, txtId.getText());
-                int apagado = pst.executeUpdate();
+            if (!idValido()) {
+                return;
+            }
+            try (PreparedStatement exclusao = conexao.prepareStatement(sql)) {
+                exclusao.setInt(1, Integer.parseInt(txtId.getText().trim()));
+                int apagado = exclusao.executeUpdate();
                 if (apagado > 0){
-                    JOptionPane.showMessageDialog(null, "USU�RIO APAGADO");
-//                    limpa o formulario
-                    txtNome.setText(null);
-                    txtEmail.setText(null);
-                    txtSenha.setText(null);
-                } 
-                pst.executeUpdate();
-            } catch(Exception e) {
-                JOptionPane.showMessageDialog(null, e);
+                    JOptionPane.showMessageDialog(null, "USUÁRIO APAGADO");
+                    limparCampos(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Usuário não encontrado.");
+                }
+            } catch(SQLException e) {
+                JOptionPane.showMessageDialog(null, "Erro ao apagar usuário: " + e.getMessage());
             }
         }
+    }
+
+    private boolean idValido() {
+        try {
+            if (Integer.parseInt(txtId.getText().trim()) > 0) {
+                return true;
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        JOptionPane.showMessageDialog(null, "Informe um ID numérico válido.");
+        return false;
+    }
+
+    private boolean camposUsuarioValidos() {
+        if (txtNome.getText().trim().isEmpty() || txtEmail.getText().trim().isEmpty()
+                || txtSenha.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Preencha nome, e-mail e senha.");
+            return false;
+        }
+        if (!txtEmail.getText().trim().contains("@")) {
+            JOptionPane.showMessageDialog(null, "Informe um e-mail válido.");
+            return false;
+        }
+        return true;
+    }
+
+    private void limparCampos(boolean limparId) {
+        if (limparId) {
+            txtId.setText(null);
+        }
+        txtNome.setText(null);
+        txtEmail.setText(null);
+        txtSenha.setText(null);
     }
 
     @SuppressWarnings("unchecked")

@@ -46,11 +46,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
         });
 
         cliente.setText("Cliente");
-        cliente.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                clienteMouseClicked(evt);
-            }
-        });
         cliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clienteActionPerformed(evt);
@@ -68,7 +63,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         menu.add(menuCad);
 
-        menuOpcao.setText("Opções");
+        menuOpcao.setText("OpÃ§Ãµes");
 
         menuSair.setText("Sair");
         menuSair.addActionListener(new java.awt.event.ActionListener() {
@@ -126,8 +121,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void clienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clienteActionPerformed
         TelaCliente cliente = new TelaCliente();
-        cliente.setVisible(true);
         desktop.add(cliente);
+        cliente.setVisible(true);
     }//GEN-LAST:event_clienteActionPerformed
 
     private void menuAjudaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAjudaActionPerformed
@@ -135,7 +130,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_menuAjudaActionPerformed
 
     private void menuSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSairActionPerformed
-        int sair = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja sair?", "Atenção",JOptionPane.YES_OPTION);
+        int sair = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja sair?", "AtenÃ§Ã£o", JOptionPane.YES_NO_OPTION);
         
         if (sair == JOptionPane.YES_OPTION){
             System.exit(0);
@@ -149,19 +144,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void usuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usuarioActionPerformed
         telaUsuarios usuario = new telaUsuarios();
-        usuario.setVisible(true);
         desktop.add(usuario);
+        usuario.setVisible(true);
     }//GEN-LAST:event_usuarioActionPerformed
 
     private void menuCadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCadActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_menuCadActionPerformed
-
-    private void clienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clienteMouseClicked
-        TelaCliente cliente = new TelaCliente();
-        cliente.setVisible(true);
-        desktop.add(cliente);
-    }//GEN-LAST:event_clienteMouseClicked
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
