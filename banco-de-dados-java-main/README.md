@@ -1,6 +1,9 @@
-#Atividade Swing
+
+# Atividade Swing
 
 ## Estrutura do projeto:
+
+```text
 +---src
     +---dal
     |       Mod_conexao.java
@@ -20,32 +23,39 @@
             TelaSobre.java
             telaUsuarios.form
             telaUsuarios.java
+```
 
 ## Stack do Projeto
- - Java: Linguagem de programação principal.
- - Java Swing: Framework para criação da interface gráfica (telas).
- - XAMPP (MySQL): Servidor local utilizado para gerenciar o banco de dados.
- - MySQL Connector: Driver para conexão entre Java e MySQL.
- - NetBeans: Ambiente de desenvolvimento e design das telas.
+
+- Java: Linguagem de programação principal.
+- Java Swing: Framework para criação da interface gráfica (telas).
+- XAMPP (MySQL): Servidor local utilizado para gerenciar o banco de dados.
+- MySQL Connector: Driver para conexão entre Java e MySQL.
+- NetBeans: Ambiente de desenvolvimento e design das telas.
 
 ## Funcionalidades:
- - Login simples: Apenas um select no banco, sem criptografia ou.
- - Crud cliente: Crud apenas com verificação simples de campos sendo o mais avançado um regex para cpf e cnpj.
- - Crud usuário: Crud para usuário de login.
+
+- Login simples: Apenas um select no banco, sem criptografia ou.
+- Crud cliente: Crud apenas com verificação simples de campos sendo o mais avançado um regex para cpf e cnpj.
+- Crud usuário: Crud para usuário de login.
 
 ## Entidades:
- - USUARIO: id(incremental), nome, email e senha(sem hash).
- - CLIENTE: id(incremental), nome, endereco, cidade, uf, doc, fone, data de nascimento, tipo de personalidade juridica.
+
+- USUARIO: id(incremental), nome, email e senha(sem hash).
+- CLIENTE: id(incremental), nome, endereco, cidade, uf, doc, fone, data de nascimento, tipo de personalidade juridica.
 
 ## Telas:
- - TelaUsuarios: Login para a aplicação, também mostra status de conexão com o banco.
- - TelaPrincipal: Visão geral da aplicação.
- - TelaSobre: Dá créditos e direito de distribuição.
- - TelaCliente: Parte central, onde contém todas as funções CRUD do cliente.
+
+- TelaUsuarios: Login para a aplicação, também mostra status de conexão com o banco.
+- TelaPrincipal: Visão geral da aplicação.
+- TelaSobre: Dá créditos e direito de distribuição.
+- TelaCliente: Parte central, onde contém todas as funções CRUD do cliente.
 
 ## Requisitos para rodar:
 
 ### SQL:
+
+```sql
 -- 0. Banco
 CREATE DATABASE usuarios; -- Se mudar o nome modifique Mod_conexao
 
@@ -74,16 +84,22 @@ CREATE TABLE tb_cliente (
     data_nasc DATE,
     status VARCHAR(2) -- PF ou PJ. Também pode ser facilitado com ENUM
 );
+```
 
 ### Dependência:
- - MYSQL connector.
+
+- MYSQL connector.
 
 ### Rodando:
- - Inicie os serviços MYSQL e Apache no XAMPP.
 
- cd poo2\banco-de-dados-java-main\
- ant clean jar
- ant run
+- Inicie os serviços MYSQL e Apache no XAMPP.
 
-Observação:
-    O projeto NÃO segue alguns padrões de desenvolvimento, como convenções de nomenclatura, boas práticas de segurança, separação de responsabilidades, arquitetura baseada em domínio, etc, pois foi desenvolvido a partir de uma estrutura-base fornecida previamente, que já apresentava tais limitações.
+```powershell
+cd poo2\banco-de-dados-java-main\
+ant clean jar
+ant run
+```
+
+**Observação:**
+
+O projeto NÃO segue alguns padrões de desenvolvimento, como convenções de nomenclatura, boas práticas de segurança, separação de responsabilidades, arquitetura baseada em domínio, etc, pois foi desenvolvido a partir de uma estrutura-base fornecida previamente, que já apresentava tais limitações.
