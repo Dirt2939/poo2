@@ -1,30 +1,89 @@
-## Sistema de Login com Java e Banco de Dados XAMPP
-Este é um projeto de exemplo que demonstra como criar um sistema de login em Java utilizando o NetBeans IDE e integrando-o com um banco de dados MySQL usando o XAMPP.
+#Atividade Swing
 
-## Descrição
-Este projeto visa criar um sistema de login completo em Java, utilizando o ambiente de desenvolvimento NetBeans e integrando-o com um banco de dados MySQL gerenciado pelo XAMPP. O sistema permite que os usuários se cadastrem com um nome de usuário e senha, que são armazenados de forma segura no banco de dados. Além disso, os usuários podem fazer login usando suas credenciais cadastradas para acessar o sistema.
+## Estrutura do projeto:
++---src
+    +---dal
+    |       Mod_conexao.java
+    |
+    +---icones
+    |       KnobCancel.png
+    |       KnobValidGreen.png
+    |
+    \---telas
+            TelaCliente.form
+            TelaCliente.java
+            TelaLogin.form
+            TelaLogin.java
+            TelaPrincipal.form
+            TelaPrincipal.java
+            TelaSobre.form
+            TelaSobre.java
+            telaUsuarios.form
+            telaUsuarios.java
 
-O sistema é construído com uma interface visual, aproveitando as bibliotecas gráficas fornecidas pelo NetBeans IDE para criar uma experiência de usuário intuitiva e agradável. Os formulários de cadastro e login são projetados de forma amigável, fornecendo feedback adequado para o usuário durante o processo.
+## Stack do Projeto
+ - Java: Linguagem de programação principal.
+ - Java Swing: Framework para criação da interface gráfica (telas).
+ - XAMPP (MySQL): Servidor local utilizado para gerenciar o banco de dados.
+ - MySQL Connector: Driver para conexão entre Java e MySQL.
+ - NetBeans: Ambiente de desenvolvimento e design das telas.
 
-A integração com o banco de dados XAMPP é essencial para o armazenamento seguro das informações dos usuários. O banco de dados é configurado para armazenar os dados de usuário, incluindo seus nomes de usuário e senhas.
+## Funcionalidades:
+ - Login simples: Apenas um select no banco, sem criptografia ou.
+ - Crud cliente: Crud apenas com verificação simples de campos sendo o mais avançado um regex para cpf e cnpj.
+ - Crud usuário: Crud para usuário de login.
 
-Este projeto serve como uma base sólida para o desenvolvimento de sistemas de login mais complexos e robustos em Java, e pode ser estendido com funcionalidades adicionais, como recuperação de senha, controle de acesso baseado em funções, entre outros.
+## Entidades:
+ - USUARIO: id(incremental), nome, email e senha(sem hash).
+ - CLIENTE: id(incremental), nome, endereco, cidade, uf, doc, fone, data de nascimento, tipo de personalidade juridica.
 
-## Recurso
-- Cadastro de usuários
-- Login de usuários
-- Validação de credenciais
-- Integração com banco de dados MySQL
-- Tecnologias Utilizadas
-- Java
-- NetBeans IDE
-- MySQL
-- XAMPP
+## Telas:
+ - TelaUsuarios: Login para a aplicação, também mostra status de conexão com o banco.
+ - TelaPrincipal: Visão geral da aplicação.
+ - TelaSobre: Dá créditos e direito de distribuição.
+ - TelaCliente: Parte central, onde contém todas as funções CRUD do cliente.
 
+## Requisitos para rodar:
 
-Sinta-se à vontade para personalizar este README de acordo com as especificidades do seu projeto e adicionar qualquer outra informação relevante.
+### SQL:
+-- 0. Banco
+CREATE DATABASE usuarios; -- Se mudar o nome modifique Mod_conexao
 
+USE usuarios;
 
+-- 1. Tabela de Login (Acesso do Usuário)
+CREATE TABLE tb_usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL
+);
 
+-- 2. Cria usuário para login
+INSERT INTO tb_usuario (nome, email, senha) VALUES ("xiru", "xiru@gmail.com", "123");
 
+-- 3. Tabela com os dados do cliente
+CREATE TABLE tb_cliente (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    endereco VARCHAR(150),
+    cidade VARCHAR(100),
+    uf CHAR(2),
+    documento VARCHAR(20) UNIQUE, -- CPF ou CNPJ
+    fone VARCHAR(20),
+    data_nasc DATE,
+    status VARCHAR(2) -- PF ou PJ. Também pode ser facilitado com ENUM
+);
 
+### Dependência:
+ - MYSQL connector.
+
+### Rodando:
+ - Inicie os serviços MYSQL e Apache no XAMPP.
+
+ cd poo2\banco-de-dados-java-main\
+ ant clean jar
+ ant run
+
+Observação:
+    O projeto NÃO segue alguns padrões de desenvolvimento, como convenções de nomenclatura, boas práticas de segurança, separação de responsabilidades, arquitetura baseada em domínio, etc, pois foi desenvolvido a partir de uma estrutura-base fornecida previamente, que já apresentava tais limitações.
